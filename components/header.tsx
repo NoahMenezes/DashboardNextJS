@@ -8,7 +8,8 @@ import { cn } from '@/lib/utils'
 import { ModeToggle } from './ui/ModeToggle'
 
 const menuItems = [
-    { name: 'Features', href: '#link' },
+    { name: 'Home', href: '/' },
+    { name: 'Features', href: '/features' },
     { name: 'Solution', href: '#link' },
     { name: 'Pricing', href: '#link' },
     { name: 'About', href: '#link' },
