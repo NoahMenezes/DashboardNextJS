@@ -51,63 +51,63 @@ export default function Features() {
   const features: Feature[] = [
     {
       icon: Zap,
-      title: "Faaast",
-      description: "It supports an entire helping developers and innovate.",
+      title: "Lightning Fast",
+      description: "AI-powered performance optimization delivers instant results and real-time responses.",
     },
     {
       icon: Cpu,
-      title: "Powerful",
-      description: "It supports an entire helping developers and businesses.",
+      title: "Intelligent Automation",
+      description: "AI algorithms automate complex workflows and eliminate repetitive tasks.",
     },
     {
       icon: Fingerprint,
-      title: "Security",
-      description: "It supports an helping developers businesses.",
+      title: "AI-Powered Security",
+      description: "Advanced AI threat detection and protection keeps your data secure 24/7.",
     },
     {
       icon: Pencil,
-      title: "Customization",
-      description: "It supports helping developers and businesses innovate.",
+      title: "Smart Customization",
+      description: "AI learns your preferences and adapts the interface to your workflow.",
     },
     {
       icon: Settings2,
-      title: "Control",
-      description: "It supports helping developers and businesses innovate.",
+      title: "Full Control",
+      description: "Maintain complete oversight while AI handles the heavy lifting.",
     },
     {
       icon: Sparkles,
-      title: "Built for AI",
-      description: "It supports helping developers and businesses innovate.",
+      title: "AI-First Platform",
+      description: "Built from the ground up with artificial intelligence at its core.",
     },
     {
       icon: Globe,
-      title: "Global Scale",
-      description: "Deployed on the edge, available worldwide for minimal latency.",
+      title: "Global AI Network",
+      description: "Distributed AI processing across the globe for minimal latency.",
     },
     {
       icon: BarChart3,
-      title: "Real-time Analytics",
-      description: "Get deep insights into your users' behavior instantly.",
+      title: "AI Analytics",
+      description: "Predictive insights and intelligent recommendations based on real-time data.",
     },
     {
       icon: Users,
-      title: "Team Collaboration",
-      description: "Built-in tools for your entire team to work together seamlessly.",
+      title: "AI Team Assistant",
+      description: "Virtual AI assistant coordinates team collaboration and streamlines communication.",
     },
     {
       icon: Code2,
-      title: "Developer API",
-      description: "Extensible API for deeply integrating with your existing stack.",
+      title: "AI API Integration",
+      description: "Powerful API with AI capabilities that integrates with your existing tools.",
     },
     {
       icon: ShieldCheck,
-      title: "Enterprise Grade",
-      description: "Bank-grade security and compliance ready for the enterprise.",
+      title: "Enterprise AI",
+      description: "Enterprise-grade AI with compliance, security, and scalability built-in.",
     },
     {
       icon: Cloud,
-      title: "Cloud Sync",
-      description: "Everything is synced to the cloud in real-time, never lose data.",
+      title: "AI Cloud Sync",
+      description: "Intelligent cloud synchronization with AI-powered conflict resolution.",
     },
   ];
 
@@ -116,12 +116,12 @@ export default function Features() {
       <div className="mx-auto max-w-5xl space-y-8 px-6 md:space-y-16">
         <div className="relative z-10 mx-auto max-w-xl space-y-6 text-center md:space-y-12">
           <h2 className="text-balance text-4xl font-medium lg:text-5xl">
-            The foundation for creative teams management
+            AI-Powered Features for Maximum Productivity
           </h2>
           <p>
-            Lyra is evolving to be more than just the models. It supports an
-            entire to the APIs and platforms helping developers and businesses
-            innovate.
+            Our platform leverages cutting-edge AI technology to streamline your
+            workflows, automate repetitive tasks, and empower your team to
+            achieve more.
           </p>
         </div>
 

@@ -16,8 +16,18 @@ import { HeroHeader } from './header'
 import FooterSection from './footer'
 import { motion } from 'motion/react'
 
+interface BlogPost {
+    id: number
+    title: string
+    category: string
+    date: string
+    readTime: string
+    image?: string
+    image_url?: string
+}
+
 export function BlogSection() {
-    const [posts, setPosts] = React.useState([])
+    const [posts, setPosts] = React.useState<BlogPost[]>([])
     const [loading, setLoading] = React.useState(true)
 
     React.useEffect(() => {
@@ -37,7 +47,7 @@ export function BlogSection() {
     }, [])
 
     if (loading) {
-        return <div className="py-24 bg-black text-white text-center">Loading insights...</div>
+        return <div className="py-24 bg-black text-white text-center">Loading AI productivity insights...</div>
     }
 
     return (
@@ -49,10 +59,10 @@ export function BlogSection() {
                             preset="fade-in-blur"
                             as="h2"
                             className="text-4xl md:text-5xl font-bold tracking-tight text-white">
-                            Latest Insights
+                            AI Productivity Insights
                         </TextEffect>
                         <p className="text-zinc-400 max-w-md text-lg leading-relaxed">
-                            Exploring the intersection of design, technology, and the future of digital experiences.
+                            Discover how AI-powered tools and intelligent automation are transforming productivity across industries.
                         </p>
                     </div>
                     <Link
@@ -97,11 +107,11 @@ export function BlogSection() {
                             },
                         }}
                     >
-                        {posts.map((post: any) => (
+                        {posts.map((post) => (
                             <Link key={post.id} href={`/blog/${post.id}`} className="block group">
                                 <div className="relative aspect-[16/10] overflow-hidden rounded-[2.5rem] border border-white/10 bg-zinc-900 transition-all duration-500 group-hover:border-primary/50 group-hover:shadow-[0_0_50px_-12px_rgba(var(--primary),0.2)]">
                                     <Image
-                                        src={post.image || post.image_url}
+                                        src={post.image || post.image_url || '/placeholder.png'}
                                         alt={post.title}
                                         fill
                                         className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
@@ -146,8 +156,8 @@ export default function BlogPage() {
 
                 <section className="mx-auto max-w-7xl px-6 py-24 border-t border-white/5">
                     <div className="flex flex-col items-center justify-center space-y-8 text-center">
-                        <h2 className="text-3xl font-bold">Stay Updated with Our Newsletter</h2>
-                        <p className="text-zinc-400 max-w-lg">Get the latest news and industry insights delivered straight to your inbox.</p>
+                        <h2 className="text-3xl font-bold">Stay Ahead with AI Productivity Updates</h2>
+                        <p className="text-zinc-400 max-w-lg">Get the latest AI productivity tips, tool updates, and industry insights delivered to your inbox.</p>
                         <div className="flex w-full max-w-md gap-4">
                             <input
                                 type="email"
