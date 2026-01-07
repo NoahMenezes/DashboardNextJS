@@ -84,24 +84,24 @@ export default function HeroSection() {
                         />
 
                         {/* LaserFlow Background - Falls from top, behind text, above image */}
-                        <div className="absolute inset-x-0 top-0 h-[800px] -z-5 pointer-events-none overflow-hidden">
+                        <div className="absolute inset-x-0 top-0 h-[900px] -z-5 pointer-events-none overflow-hidden">
                             <LaserFlow
-                                wispDensity={1.2}
-                                verticalBeamOffset={-0.3}
+                                wispDensity={2.0}
+                                verticalBeamOffset={-0.25}
                                 horizontalBeamOffset={0}
-                                flowSpeed={0.4}
-                                verticalSizing={2.5}
-                                horizontalSizing={0.6}
-                                fogIntensity={0.5}
-                                fogScale={0.25}
-                                wispSpeed={12}
-                                wispIntensity={6}
-                                flowStrength={0.3}
-                                decay={1.2}
-                                falloffStart={1.3}
-                                fogFallSpeed={0.8}
-                                color="#8B5CF6"
-                                className="w-full h-full opacity-40"
+                                flowSpeed={0.5}
+                                verticalSizing={3.0}
+                                horizontalSizing={0.8}
+                                fogIntensity={0.85}
+                                fogScale={0.35}
+                                wispSpeed={15}
+                                wispIntensity={10}
+                                flowStrength={0.4}
+                                decay={1.0}
+                                falloffStart={1.5}
+                                fogFallSpeed={0.9}
+                                color="#A78BFA"
+                                className="w-full h-full opacity-75"
                             />
                         </div>
 
