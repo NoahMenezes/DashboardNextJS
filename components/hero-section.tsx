@@ -7,6 +7,7 @@ import { TextEffect } from '@/components/ui/text-effect'
 import { AnimatedGroup } from '@/components/ui/animated-group'
 import { HeroHeader } from './header'
 import { Variants } from 'motion/react'
+import LaserFlow from './laser-flow'
 
 const transitionVariants: { container?: Variants; item?: Variants } = {
     item: {
@@ -82,8 +83,30 @@ export default function HeroSection() {
                             className="absolute inset-0 -z-10 size-full [background:radial-gradient(125%_125%_at_50%_100%,transparent_0%,var(--color-background)_75%)]"
                         />
 
+                        {/* LaserFlow Background - Falls from top, behind text, above image */}
+                        <div className="absolute inset-x-0 top-0 h-[800px] -z-5 pointer-events-none overflow-hidden">
+                            <LaserFlow
+                                wispDensity={1.2}
+                                verticalBeamOffset={-0.3}
+                                horizontalBeamOffset={0}
+                                flowSpeed={0.4}
+                                verticalSizing={2.5}
+                                horizontalSizing={0.6}
+                                fogIntensity={0.5}
+                                fogScale={0.25}
+                                wispSpeed={12}
+                                wispIntensity={6}
+                                flowStrength={0.3}
+                                decay={1.2}
+                                falloffStart={1.3}
+                                fogFallSpeed={0.8}
+                                color="#8B5CF6"
+                                className="w-full h-full opacity-40"
+                            />
+                        </div>
+
                         <div className="mx-auto max-w-7xl px-6">
-                            <div className="text-center sm:mx-auto lg:mr-auto lg:mt-0">
+                            <div className="text-center sm:mx-auto lg:mr-auto lg:mt-0 relative z-10">
                                 <AnimatedGroup variants={transitionVariants}>
                                     <Link
                                         href="#link"
@@ -172,7 +195,7 @@ export default function HeroSection() {
                                 },
                                 ...transitionVariants,
                             }}>
-                            <div className="mask-b-from-55% relative -mr-56 mt-8 overflow-hidden px-2 sm:mr-0 sm:mt-12 md:mt-20">
+                            <div className="mask-b-from-55% relative -mr-56 mt-8 overflow-hidden px-2 sm:mr-0 sm:mt-12 md:mt-20 z-20">
                                 <div className="inset-shadow-2xs ring-background dark:inset-shadow-white/20 bg-background relative mx-auto max-w-6xl overflow-hidden rounded-2xl border p-4 shadow-lg shadow-zinc-950/15 ring-1">
                                     <Image
                                         className="bg-background aspect-15/8 relative hidden rounded-2xl dark:block"

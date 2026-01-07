@@ -376,7 +376,11 @@ function resizeCanvasToDisplaySize(canvas: HTMLCanvasElement): boolean {
 function makeBuffer(gl: WebGL2RenderingContext, sizeOrData: BufferSource | number, usage: number): WebGLBuffer | null {
   const buf = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-  gl.bufferData(gl.ARRAY_BUFFER, sizeOrData, usage);
+  if (typeof sizeOrData === 'number') {
+    gl.bufferData(gl.ARRAY_BUFFER, sizeOrData, usage);
+  } else {
+    gl.bufferData(gl.ARRAY_BUFFER, sizeOrData, usage);
+  }
   gl.bindBuffer(gl.ARRAY_BUFFER, null);
   return buf;
 }
@@ -615,7 +619,7 @@ class InfiniteGridMenu {
     );
 
     const gl = this.gl;
-    const needsResize = resizeCanvasToDisplaySize(gl.canvas);
+    const needsResize = resizeCanvasToDisplaySize(gl.canvas as HTMLCanvasElement);
     if (needsResize) {
       gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
     }
@@ -841,7 +845,8 @@ class InfiniteGridMenu {
   }
 
   private updateProjectionMatrix(gl: WebGL2RenderingContext): void {
-    this.camera.aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+    const canvas = gl.canvas as HTMLCanvasElement;
+    this.camera.aspect = canvas.clientWidth / canvas.clientHeight;
     const height = this.SPHERE_RADIUS * 0.35;
     const distance = this.camera.position[2];
     if (this.camera.aspect > 1) {
