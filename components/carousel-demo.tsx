@@ -1,6 +1,6 @@
 "use client";
 
-import Carousel from "@/components/ui/carousel";
+import Carousel from "@/components/ui/apple-carousel";
 export default function CarouselDemo() {
   const slideData = [
     {

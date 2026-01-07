@@ -1,14 +1,91 @@
+"use client"
+
+import React, { useState } from 'react'
 import { LogoIcon } from '@/components/logo'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useGoogleLogin } from '@react-oauth/google'
 
-export default function LoginPage() {
+export default function SignupPage() {
+    const router = useRouter()
+    const [formData, setFormData] = useState({
+        firstName: '',
+        lastName: '',
+        email: '',
+        password: ''
+    })
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState('')
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }))
+    }
+
+    const googleLogin = useGoogleLogin({
+        onSuccess: async (tokenResponse: any) => {
+            try {
+                // Send access token to backend for verification and login/signup
+                const res = await fetch('http://localhost:5000/api/auth/google', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: tokenResponse.access_token })
+                });
+
+                const data = await res.json()
+
+                if (!res.ok) throw new Error(data.error || 'Google signup failed')
+
+                // Save token and user data
+                localStorage.setItem('token', data.token)
+                localStorage.setItem('user', JSON.stringify(data.user))
+
+                // Redirect to home
+                router.push('/')
+            } catch (err: any) {
+                setError(err.message)
+            }
+        },
+        onError: () => setError('Google Signup Failed'),
+    });
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault()
+        setLoading(true)
+        setError('')
+
+        try {
+            const res = await fetch('http://localhost:5000/api/signup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            })
+
+            const data = await res.json()
+
+            if (!res.ok) {
+                throw new Error(data.error || 'Something went wrong')
+            }
+
+            // Save token and user data to localStorage (Automatic login)
+            localStorage.setItem('token', data.token)
+            localStorage.setItem('user', JSON.stringify(data.user))
+
+            // Success - redirect to home
+            router.push('/')
+        } catch (err: any) {
+            setError(err.message)
+        } finally {
+            setLoading(false)
+        }
+    }
+
     return (
         <section className="flex min-h-screen bg-zinc-50 px-4 py-16 md:py-32 dark:bg-transparent">
             <form
-                action=""
+                onSubmit={handleSubmit}
                 className="bg-muted m-auto h-fit w-full max-w-sm overflow-hidden rounded-[calc(var(--radius)+.125rem)] border shadow-md shadow-zinc-950/5 dark:[--color-muted:var(--color-zinc-900)]">
                 <div className="bg-card -m-px rounded-[calc(var(--radius)+.125rem)] border p-8 pb-6">
                     <div className="text-center">
@@ -22,32 +99,42 @@ export default function LoginPage() {
                         <p className="text-sm">Welcome! Create an account to get started</p>
                     </div>
 
+                    {error && (
+                        <div className="mt-4 rounded-md bg-destructive/15 p-3 text-sm text-destructive">
+                            {error}
+                        </div>
+                    )}
+
                     <div className="mt-6 space-y-6">
                         <div className="grid grid-cols-2 gap-3">
                             <div className="space-y-2">
                                 <Label
-                                    htmlFor="firstname"
+                                    htmlFor="firstName"
                                     className="block text-sm">
                                     Firstname
                                 </Label>
                                 <Input
                                     type="text"
                                     required
-                                    name="firstname"
-                                    id="firstname"
+                                    name="firstName"
+                                    id="firstName"
+                                    value={formData.firstName}
+                                    onChange={handleChange}
                                 />
                             </div>
                             <div className="space-y-2">
                                 <Label
-                                    htmlFor="lastname"
+                                    htmlFor="lastName"
                                     className="block text-sm">
                                     Lastname
                                 </Label>
                                 <Input
                                     type="text"
                                     required
-                                    name="lastname"
-                                    id="lastname"
+                                    name="lastName"
+                                    id="lastName"
+                                    value={formData.lastName}
+                                    onChange={handleChange}
                                 />
                             </div>
                         </div>
@@ -56,20 +143,22 @@ export default function LoginPage() {
                             <Label
                                 htmlFor="email"
                                 className="block text-sm">
-                                Username
+                                Email
                             </Label>
                             <Input
                                 type="email"
                                 required
                                 name="email"
                                 id="email"
+                                value={formData.email}
+                                onChange={handleChange}
                             />
                         </div>
 
                         <div className="space-y-0.5">
                             <div className="flex items-center justify-between">
                                 <Label
-                                    htmlFor="pwd"
+                                    htmlFor="password"
                                     className="text-sm">
                                     Password
                                 </Label>
@@ -87,13 +176,17 @@ export default function LoginPage() {
                             <Input
                                 type="password"
                                 required
-                                name="pwd"
-                                id="pwd"
+                                name="password"
+                                id="password"
                                 className="input sz-md variant-mixed"
+                                value={formData.password}
+                                onChange={handleChange}
                             />
                         </div>
 
-                        <Button className="w-full">Sign In</Button>
+                        <Button type="submit" className="w-full" disabled={loading}>
+                            {loading ? 'Creating Account...' : 'Sign Up'}
+                        </Button>
                     </div>
 
                     <div className="my-6 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
@@ -105,7 +198,8 @@ export default function LoginPage() {
                     <div className="grid grid-cols-2 gap-3">
                         <Button
                             type="button"
-                            variant="outline">
+                            variant="outline"
+                            onClick={() => googleLogin()}>
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 width="0.98em"
@@ -150,18 +244,18 @@ export default function LoginPage() {
                             <span>Microsoft</span>
                         </Button>
                     </div>
-                </div>
 
-                <div className="p-3">
-                    <p className="text-accent-foreground text-center text-sm">
-                        Have an account ?
-                        <Button
-                            asChild
-                            variant="link"
-                            className="px-2">
-                            <Link href="#">Sign In</Link>
-                        </Button>
-                    </p>
+                    <div className="p-3">
+                        <p className="text-accent-foreground text-center text-sm">
+                            Have an account ?
+                            <Button
+                                asChild
+                                variant="link"
+                                className="px-2">
+                                <Link href="/login">Sign In</Link>
+                            </Button>
+                        </p>
+                    </div>
                 </div>
             </form>
         </section>

@@ -6,11 +6,13 @@ import { Button } from '@/components/ui/button'
 import React from 'react'
 import { cn } from '@/lib/utils'
 import { ModeToggle } from './ui/ModeToggle'
+import { UserProfile } from './user-profile'
 
 const menuItems = [
     { name: 'Home', href: '/' },
     { name: 'Features', href: '/features' },
     { name: 'Dashboard', href: '/dashboard' },
+    { name: 'Blog', href: '/blog' },
     { name: 'Pricing', href: '#link' },
     { name: 'About', href: '#link' },
 ]
@@ -18,14 +20,26 @@ const menuItems = [
 export const HeroHeader = () => {
     const [menuState, setMenuState] = React.useState(false)
     const [isScrolled, setIsScrolled] = React.useState(false)
+    const [user, setUser] = React.useState<any>(null)
 
     React.useEffect(() => {
         const handleScroll = () => {
             setIsScrolled(window.scrollY > 50)
         }
         window.addEventListener('scroll', handleScroll)
+
+        const storedUser = localStorage.getItem('user')
+        if (storedUser) {
+            try {
+                setUser(JSON.parse(storedUser))
+            } catch (error) {
+                console.error("Failed to parse user from localStorage", error)
+            }
+        }
+
         return () => window.removeEventListener('scroll', handleScroll)
     }, [])
+
     return (
         <header>
             <nav
@@ -78,33 +92,39 @@ export const HeroHeader = () => {
                                     ))}
                                 </ul>
                             </div>
-                            <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-3 sm:space-y-0 md:w-fit">
+                            <div className="flex w-full flex-col items-center space-y-3 sm:flex-row sm:gap-3 sm:space-y-0 md:w-fit">
                                 <ModeToggle />
-                                <Button
-                                    asChild
-                                    variant="outline"
-                                    size="sm"
-                                    className={cn(isScrolled && 'lg:hidden')}>
-                                    <Link href="#">
-                                        <span>Login</span>
-                                    </Link>
-                                </Button>
-                                <Button
-                                    asChild
-                                    size="sm"
-                                    className={cn(isScrolled && 'lg:hidden')}>
-                                    <Link href="#">
-                                        <span>Sign Up</span>
-                                    </Link>
-                                </Button>
-                                <Button
-                                    asChild
-                                    size="sm"
-                                    className={cn(isScrolled ? 'lg:inline-flex' : 'hidden')}>
-                                    <Link href="#">
-                                        <span>Get Started</span>
-                                    </Link>
-                                </Button>
+                                {user ? (
+                                    <UserProfile user={user} />
+                                ) : (
+                                    <>
+                                        <Button
+                                            asChild
+                                            variant="outline"
+                                            size="sm"
+                                            className={cn(isScrolled && 'lg:hidden')}>
+                                            <Link href="/login">
+                                                <span>Login</span>
+                                            </Link>
+                                        </Button>
+                                        <Button
+                                            asChild
+                                            size="sm"
+                                            className={cn(isScrolled && 'lg:hidden')}>
+                                            <Link href="/signup">
+                                                <span>Sign Up</span>
+                                            </Link>
+                                        </Button>
+                                        <Button
+                                            asChild
+                                            size="sm"
+                                            className={cn(isScrolled ? 'lg:inline-flex' : 'hidden')}>
+                                            <Link href="/signup">
+                                                <span>Get Started</span>
+                                            </Link>
+                                        </Button>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </div>
