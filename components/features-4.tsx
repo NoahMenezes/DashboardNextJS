@@ -7,9 +7,16 @@ import {
   Settings2,
   Sparkles,
   Zap,
+  Globe,
+  BarChart3,
+  Users,
+  Code2,
+  ShieldCheck,
+  Cloud,
 } from "lucide-react";
+
 import { CardPattern } from "@/components/ui/evervault-card";
-import { useMotionValue } from "motion/react";
+import { motion, useMotionValue } from "motion/react";
 import { useState, useCallback, useRef } from "react";
 import type { LucideIcon } from "lucide-react";
 
@@ -18,6 +25,27 @@ interface Feature {
   title: string;
   description: string;
 }
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+    },
+  },
+};
 
 export default function Features() {
   const features: Feature[] = [
@@ -51,6 +79,36 @@ export default function Features() {
       title: "Built for AI",
       description: "It supports helping developers and businesses innovate.",
     },
+    {
+      icon: Globe,
+      title: "Global Scale",
+      description: "Deployed on the edge, available worldwide for minimal latency.",
+    },
+    {
+      icon: BarChart3,
+      title: "Real-time Analytics",
+      description: "Get deep insights into your users' behavior instantly.",
+    },
+    {
+      icon: Users,
+      title: "Team Collaboration",
+      description: "Built-in tools for your entire team to work together seamlessly.",
+    },
+    {
+      icon: Code2,
+      title: "Developer API",
+      description: "Extensible API for deeply integrating with your existing stack.",
+    },
+    {
+      icon: ShieldCheck,
+      title: "Enterprise Grade",
+      description: "Bank-grade security and compliance ready for the enterprise.",
+    },
+    {
+      icon: Cloud,
+      title: "Cloud Sync",
+      description: "Everything is synced to the cloud in real-time, never lose data.",
+    },
   ];
 
   return (
@@ -67,11 +125,19 @@ export default function Features() {
           </p>
         </div>
 
-        <div className="relative mx-auto grid max-w-4xl divide-x divide-y border *:p-12 sm:grid-cols-2 lg:grid-cols-3">
+        <motion.div 
+          className="relative mx-auto grid max-w-4xl divide-x divide-y border *:p-12 sm:grid-cols-2 lg:grid-cols-3"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+        >
           {features.map((feature, index) => (
-            <FeatureCard key={index} feature={feature} />
+            <motion.div key={index} variants={itemVariants} className="h-full">
+               <FeatureCard feature={feature} />
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

@@ -3,7 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CardPattern } from "@/components/ui/evervault-card";
-import { useMotionValue } from "motion/react";
+import { motion, useMotionValue } from "motion/react";
 import { useState, useCallback, useRef } from "react";
 import { Quote } from "lucide-react";
 
@@ -14,6 +14,27 @@ interface Testimonial {
   quote: string;
   rating: number;
 }
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, scale: 0.9 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      duration: 0.5,
+    },
+  },
+};
 
 export default function Testimonials5() {
   const testimonials: Testimonial[] = [
@@ -65,6 +86,30 @@ export default function Testimonials5() {
         "The security features and compliance tools give us peace of mind. Highly recommended for enterprise use.",
       rating: 5,
     },
+    {
+      name: "Robert Taylor",
+      role: "Director of Product",
+      image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=150&q=80",
+      quote:
+        "The analytics dashboard is intuitive and provides exactly the data we need to make informed decisions.",
+      rating: 5,
+    },
+    {
+      name: "Jennifer Wu",
+      role: "Senior Developer",
+      image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80",
+      quote:
+        "The code generation capabilities are impressive. It saves us hours of boilerplate coding every week.",
+      rating: 5,
+    },
+    {
+      name: "Thomas Lee",
+      role: "Engineering Manager",
+      image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=150&q=80",
+      quote:
+        "Seamless deployment and scaling. We've had zero downtime since migrating our core services.",
+      rating: 5,
+    },
   ];
 
   return (
@@ -80,11 +125,19 @@ export default function Testimonials5() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <motion.div 
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+        >
           {testimonials.map((testimonial, index) => (
-            <TestimonialCard key={index} testimonial={testimonial} />
+            <motion.div key={index} variants={itemVariants} className="h-full">
+               <TestimonialCard testimonial={testimonial} />
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
