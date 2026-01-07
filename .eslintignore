@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build outputs
+.next/
+out/
+build/
+dist/
+
+# Backend (Node.js CommonJS)
+backend/
+**/backend/**
+
+# Scripts
+scripts/
+**/scripts/**
+
+# Environment files
+.env
+.env.local
+.env*.local
+
+# Cache
+.cache/
+*.tsbuildinfo
+
+# Generated files
+next-env.d.ts
+
+# OS files
+.DS_Store
+Thumbs.db
