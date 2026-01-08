@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useGoogleLogin } from "@react-oauth/google";
+import { API_ENDPOINTS } from "@/lib/api";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -28,7 +29,7 @@ export default function SignupPage() {
     onSuccess: async (tokenResponse: { access_token: string }) => {
       try {
         // Send access token to backend for verification and login/signup
-        const res = await fetch("http://localhost:5000/api/auth/google", {
+        const res = await fetch(API_ENDPOINTS.googleAuth, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ token: tokenResponse.access_token }),
@@ -60,7 +61,7 @@ export default function SignupPage() {
     setError("");
 
     try {
-      const res = await fetch("http://localhost:5000/api/signup", {
+      const res = await fetch(API_ENDPOINTS.signup, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),

@@ -193,7 +193,27 @@ router.get('/:id', async (req, res) => {
 });
 
 // Create new blog (authenticated)
-router.post('/', authenticateToken, async (req, res) => {
+// Create new blog (Public - creates as Guest if not logged in)
+const optionalAuth = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (!token) {
+        req.user = null;
+        return next();
+    }
+
+    jwt.verify(token, jwtSecret, (err, user) => {
+        if (err) {
+            req.user = null;
+        } else {
+            req.user = user;
+        }
+        next();
+    });
+};
+
+router.post('/', optionalAuth, async (req, res) => {
     const { title, category, imageUrl, content } = req.body;
 
     if (!title || !content) {
@@ -201,6 +221,10 @@ router.post('/', authenticateToken, async (req, res) => {
     }
 
     try {
+        // Use authenticated user ID or default to User ID 1 (Guest/Admin)
+        // Ensure User ID 1 exists in your seed script, or pick an existing ID.
+        const userId = req.user ? req.user.id : 1; 
+
         const result = await db.execute({
             sql: `
                 INSERT INTO user_blogs (user_id, title, category, image_url, content)
@@ -208,7 +232,7 @@ router.post('/', authenticateToken, async (req, res) => {
                 RETURNING id
             `,
             args: [
-                req.user.id,
+                userId,
                 title,
                 category || 'User Post',
                 imageUrl || '',

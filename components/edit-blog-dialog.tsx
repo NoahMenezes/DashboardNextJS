@@ -18,22 +18,47 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
-import { PlusCircle, Image as ImageIcon, X } from "lucide-react";
+import { Edit, Image as ImageIcon, X } from "lucide-react";
 import { motion } from "motion/react";
 import { apiClient, API_ENDPOINTS } from "@/lib/api";
 
-interface CreateBlogDialogProps {
-  onBlogCreated?: () => void;
+interface Blog {
+  id: number;
+  title: string;
+  category: string;
+  imageUrl?: string;
+  content: string;
 }
 
-export function CreateBlogDialog({ onBlogCreated }: CreateBlogDialogProps) {
-  const [open, setOpen] = React.useState(false);
-  const [title, setTitle] = React.useState("");
-  const [category, setCategory] = React.useState("");
-  const [imageUrl, setImageUrl] = React.useState("");
-  const [content, setContent] = React.useState("");
+interface EditBlogDialogProps {
+  blog: Blog;
+  onBlogUpdated?: () => void;
+  trigger?: React.ReactNode;
+  open?: boolean;
+  onClose?: () => void;
+}
+
+export function EditBlogDialog({
+  blog,
+  onBlogUpdated,
+  trigger,
+  open: controlledOpen,
+  onClose,
+}: EditBlogDialogProps) {
+  const [internalOpen, setInternalOpen] = React.useState(false);
+  const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
+  const setOpen = (value: boolean) => {
+    if (controlledOpen !== undefined) {
+      if (!value && onClose) onClose();
+    } else {
+      setInternalOpen(value);
+    }
+  };
+  const [title, setTitle] = React.useState(blog.title);
+  const [category, setCategory] = React.useState(blog.category);
+  const [imageUrl, setImageUrl] = React.useState(blog.imageUrl || "");
+  const [content, setContent] = React.useState(blog.content);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
   const [uploadingImage, setUploadingImage] = React.useState(false);
@@ -51,6 +76,17 @@ export function CreateBlogDialog({ onBlogCreated }: CreateBlogDialogProps) {
     "News",
     "Other",
   ];
+
+  // Reset form when dialog opens
+  React.useEffect(() => {
+    if (open) {
+      setTitle(blog.title);
+      setCategory(blog.category);
+      setImageUrl(blog.imageUrl || "");
+      setContent(blog.content);
+      setError("");
+    }
+  }, [open, blog]);
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -95,27 +131,22 @@ export function CreateBlogDialog({ onBlogCreated }: CreateBlogDialogProps) {
     setLoading(true);
 
     try {
-      await apiClient.post(API_ENDPOINTS.userBlogs, {
+      await apiClient.put(API_ENDPOINTS.userBlogById(blog.id), {
         title,
         category: category || "General",
         imageUrl,
         content,
       });
 
-      // Reset form
-      setTitle("");
-      setCategory("");
-      setImageUrl("");
-      setContent("");
-      setOpen(false);
-
       // Notify parent component
-      if (onBlogCreated) {
-        onBlogCreated();
+      if (onBlogUpdated) {
+        onBlogUpdated();
       }
+
+      setOpen(false);
     } catch (err) {
       const error = err as Error;
-      setError(error.message || "Failed to create blog post");
+      setError(error.message || "Failed to update blog post");
     } finally {
       setLoading(false);
     }
@@ -123,19 +154,24 @@ export function CreateBlogDialog({ onBlogCreated }: CreateBlogDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="bg-white hover:bg-zinc-200 text-black px-6 py-6 rounded-2xl font-bold flex items-center gap-2 shadow-lg hover:shadow-white/10 transition-all">
-          <PlusCircle className="w-5 h-5" />
-          Create Blog Post
-        </Button>
-      </DialogTrigger>
+      {trigger ? (
+        <div onClick={() => setOpen(true)}>{trigger}</div>
+      ) : (
+        <button
+          onClick={() => setOpen(true)}
+          className="p-3 bg-blue-500/90 hover:bg-blue-600 rounded-full transition-all shadow-lg"
+          title="Edit blog"
+        >
+          <Edit className="w-4 h-4 text-white" />
+        </button>
+      )}
       <DialogContent className="bg-zinc-900 border-white/10 text-white max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">
-            Create New Blog Post
+            Edit Blog Post
           </DialogTitle>
           <DialogDescription className="text-zinc-400">
-            Share your thoughts and ideas with the community
+            Update your blog post content
           </DialogDescription>
         </DialogHeader>
 
@@ -310,7 +346,7 @@ export function CreateBlogDialog({ onBlogCreated }: CreateBlogDialogProps) {
               disabled={loading}
               className="flex-1 bg-white hover:bg-zinc-200 text-black font-bold"
             >
-              {loading ? "Creating..." : "Create Post"}
+              {loading ? "Updating..." : "Update Post"}
             </Button>
           </div>
         </form>
