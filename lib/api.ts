@@ -1,24 +1,8 @@
-// Centralized API configuration
-const getApiBaseUrl = () => {
-  // Check if we're in the browser
-  if (typeof window !== "undefined") {
-    const hostname = window.location.hostname;
+// Centralized API configuration with static environment variable
+// This prevents hydration errors by avoiding dynamic window checks
 
-    // In production (not localhost)
-    if (hostname !== "localhost" && hostname !== "127.0.0.1") {
-      // Use environment variable or construct from current location
-      return (
-        process.env.NEXT_PUBLIC_API_URL ||
-        `${window.location.protocol}//${hostname}:5000`
-      );
-    }
-  }
-
-  // In development or SSR
-  return process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-};
-
-const API_BASE_URL = getApiBaseUrl();
+// Use static environment variable - must be set in Vercel
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 export const API_ENDPOINTS = {
   // Auth endpoints
@@ -164,8 +148,21 @@ export const authHelpers = {
   isAuthenticated: () =>
     typeof window !== "undefined" && !!localStorage.getItem("token"),
 
-  // Get current user from token
+  // Get current user from localStorage
   getCurrentUser: () => {
+    if (typeof window === "undefined") return null;
+    const userStr = localStorage.getItem("user");
+    if (!userStr) return null;
+
+    try {
+      return JSON.parse(userStr);
+    } catch {
+      return null;
+    }
+  },
+
+  // Get current user from token
+  getUserFromToken: () => {
     if (typeof window === "undefined") return null;
     const token = localStorage.getItem("token");
     if (!token) return null;
@@ -178,7 +175,7 @@ export const authHelpers = {
     }
   },
 
-  // Check if user is admin
+  // Check if user is admin (user ID 3 is admin)
   isAdmin: () => {
     const user = authHelpers.getCurrentUser();
     if (!user) return false;
@@ -187,7 +184,5 @@ export const authHelpers = {
 };
 
 // Export base URL for use in components
-export const getApiUrl = getApiBaseUrl;
 export { API_BASE_URL };
-
 export default API_ENDPOINTS;
