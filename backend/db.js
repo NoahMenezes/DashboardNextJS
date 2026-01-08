@@ -49,6 +49,21 @@ async function initDb() {
       )
     `);
 
+    // User-created blogs table
+    await db.execute(`
+      CREATE TABLE IF NOT EXISTS user_blogs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        title TEXT NOT NULL,
+        category TEXT,
+        image_url TEXT,
+        content TEXT NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `);
+
     // Seed Users
     const usersCount = await db.execute("SELECT COUNT(*) as count FROM users");
     if (usersCount.rows[0].count === 0) {

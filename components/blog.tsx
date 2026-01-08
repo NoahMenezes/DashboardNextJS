@@ -15,6 +15,7 @@ import { TextEffect } from '@/components/ui/text-effect'
 import { HeroHeader } from './header'
 import FooterSection from './footer'
 import { motion } from 'motion/react'
+import { CreateBlogDialog } from './create-blog-dialog'
 
 interface BlogPost {
     id: number
@@ -29,25 +30,44 @@ interface BlogPost {
 export function BlogSection() {
     const [posts, setPosts] = React.useState<BlogPost[]>([])
     const [loading, setLoading] = React.useState(true)
+    const [error, setError] = React.useState('')
+
+    const fetchPosts = React.useCallback(async () => {
+        try {
+            setError('')
+            setLoading(true)
+            const res = await fetch('http://localhost:5000/api/blogs')
+            if (!res.ok) throw new Error('Failed to fetch posts')
+            const data = await res.json()
+            setPosts(data)
+        } catch (error) {
+            console.error(error)
+            setError('Could not load blog posts. Please make sure the backend is running.')
+        } finally {
+            setLoading(false)
+        }
+    }, [])
 
     React.useEffect(() => {
-        const fetchPosts = async () => {
-            try {
-                const res = await fetch('http://localhost:5000/api/blogs')
-                if (!res.ok) throw new Error('Failed to fetch posts')
-                const data = await res.json()
-                setPosts(data)
-            } catch (error) {
-                console.error(error)
-            } finally {
-                setLoading(false)
-            }
-        }
         fetchPosts()
-    }, [])
+    }, [fetchPosts])
 
     if (loading) {
         return <div className="py-24 bg-black text-white text-center">Loading AI productivity insights...</div>
+    }
+
+    if (error) {
+        return (
+            <div className="py-24 bg-black text-white text-center">
+                <p className="text-red-400 mb-4">{error}</p>
+                <button 
+                    onClick={fetchPosts}
+                    className="px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                    Try Again
+                </button>
+            </div>
+        )
     }
 
     return (
@@ -65,19 +85,22 @@ export function BlogSection() {
                             Discover how AI-powered tools and intelligent automation are transforming productivity across industries.
                         </p>
                     </div>
-                    <Link
-                        href="/blog"
-                        className="group flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-white/60 hover:text-white transition-colors duration-300 md:mb-2"
-                    >
-                        View all posts
-                        <motion.span
-                            initial={{ x: 0 }}
-                            whileHover={{ x: 5 }}
-                            transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                    <div className="flex gap-3">
+                        <CreateBlogDialog onBlogCreated={fetchPosts} />
+                        <Link
+                            href="/blog"
+                            className="group flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-white/60 hover:text-white transition-colors duration-300 md:mb-2"
                         >
-                            →
-                        </motion.span>
-                    </Link>
+                            View all posts
+                            <motion.span
+                                initial={{ x: 0 }}
+                                whileHover={{ x: 5 }}
+                                transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                            >
+                                →
+                            </motion.span>
+                        </Link>
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -154,22 +177,6 @@ export default function BlogPage() {
             <main className="pt-20">
                 <BlogSection />
 
-                <section className="mx-auto max-w-7xl px-6 py-24 border-t border-white/5">
-                    <div className="flex flex-col items-center justify-center space-y-8 text-center">
-                        <h2 className="text-3xl font-bold">Stay Ahead with AI Productivity Updates</h2>
-                        <p className="text-zinc-400 max-w-lg">Get the latest AI productivity tips, tool updates, and industry insights delivered to your inbox.</p>
-                        <div className="flex w-full max-w-md gap-4">
-                            <input
-                                type="email"
-                                placeholder="Enter your email"
-                                className="flex-1 px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-white/20 transition-all"
-                            />
-                            <button className="px-8 py-4 rounded-2xl bg-white text-black font-bold hover:bg-zinc-200 transition-all">
-                                Subscribe
-                            </button>
-                        </div>
-                    </div>
-                </section>
             </main>
             <FooterSection />
         </div>

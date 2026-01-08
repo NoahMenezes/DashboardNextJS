@@ -51,4 +51,56 @@ router.get('/:id', async (req, res) => {
     }
 });
 
+// Create new blog post
+router.post('/', async (req, res) => {
+    const { title, category, imageUrl, content } = req.body;
+
+    if (!title || !content) {
+        return res.status(400).json({ error: 'Title and content are required' });
+    }
+
+    try {
+        // Generate current date and read time
+        const currentDate = new Date().toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+        const wordCount = content.split(/\s+/).length;
+        const readTime = `${Math.ceil(wordCount / 200)} min read`;
+
+        const result = await db.execute({
+            sql: `INSERT INTO blogs (title, category, date, read_time, image_url, content) 
+                  VALUES (?, ?, ?, ?, ?, ?) RETURNING id`,
+            args: [
+                title,
+                category || 'General',
+                currentDate,
+                readTime,
+                imageUrl || '',
+                content
+            ]
+        });
+
+        const blogId = result.rows[0].id;
+
+        res.status(201).json({
+            message: 'Blog created successfully',
+            blogId: blogId,
+            blog: {
+                id: blogId,
+                title,
+                category: category || 'General',
+                date: currentDate,
+                readTime,
+                image: imageUrl || '',
+                content
+            }
+        });
+    } catch (err) {
+        console.error('Error creating blog:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 module.exports = router;

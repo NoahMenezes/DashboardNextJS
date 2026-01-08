@@ -198,6 +198,9 @@ export const HeroHeader = () => {
                             </div>
                           </DropdownMenuLabel>
                           <DropdownMenuSeparator />
+                          <DropdownMenuItem asChild>
+                            <Link href="/blog/my-blogs">My Blogs</Link>
+                          </DropdownMenuItem>
                           <DropdownMenuItem onClick={handleSignOut}>
                             Sign Out
                           </DropdownMenuItem>
@@ -227,6 +230,18 @@ export const HeroHeader = () => {
                             </p>
                           </div>
                         </div>
+                        <Link
+                          href="/blog/my-blogs"
+                          onClick={() => setMenuState(false)}
+                        >
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-full mb-2"
+                          >
+                            My Blogs
+                          </Button>
+                        </Link>
                         <Button
                           onClick={handleSignOut}
                           variant="outline"

@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "concurrently \"npm run dev:next\" \"npm run dev:backend\" --names \"NEXT,BACKEND\" --prefix-colors \"blue,green\"",
+    "dev": "concurrently \"pnpm run dev:next\" \"pnpm run dev:backend\" --names \"NEXT,BACKEND\" --prefix-colors \"blue,green\"",
     "dev:next": "cross-env NODE_OPTIONS=--max-old-space-size=4096 next dev",
-    "dev:backend": "cd backend && npm run dev",
-    "dev:full": "npm run kill-ports && npm run startup-check && concurrently \"npm run dev:next\" \"npm run dev:backend\" --names \"NEXT,BACKEND\" --prefix-colors \"blue,green\"",
+    "dev:backend": "cd backend && pnpm run dev",
+    "dev:full": "pnpm run kill-ports && pnpm run startup-check && concurrently \"pnpm run dev:next\" \"pnpm run dev:backend\" --names \"NEXT,BACKEND\" --prefix-colors \"blue,green\"",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",

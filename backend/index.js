@@ -64,6 +64,10 @@ app.get("/api/health", (req, res) => {
 // Register Blog Routes
 app.use("/api/blogs", blogsRouter);
 
+// Register User Blog Routes
+const userBlogsRouter = require("./routes/user-blogs");
+app.use("/api/user-blogs", userBlogsRouter);
+
 // --- Routes ---
 
 // Signup Route
