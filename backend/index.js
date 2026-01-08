@@ -12,7 +12,38 @@ require("dotenv").config({
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+
+// CORS Configuration - Allow frontend from both local and deployed URLs
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://dashboard-next-js-m8t7.vercel.app",
+  // Add any preview deployments if needed
+  /https:\/\/dashboard-next-js-.*\.vercel\.app$/,
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps, curl, Postman)
+      if (!origin) return callback(null, true);
+
+      // Check if origin is in allowedOrigins array
+      if (
+        allowedOrigins.some((allowed) => {
+          if (allowed instanceof RegExp) {
+            return allowed.test(origin);
+          }
+          return allowed === origin;
+        })
+      ) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  }),
+);
 
 // Environment Variables
 // Database config moved to db.js
