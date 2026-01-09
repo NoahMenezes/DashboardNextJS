@@ -30,16 +30,48 @@ export default function UserBlogPostPage() {
   const id = params.id;
   const [post, setPost] = React.useState<UserBlog | null>(null);
   const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState("");
 
   React.useEffect(() => {
     const fetchPost = async () => {
       try {
-        const res = await fetch(API_ENDPOINTS.userBlogById(id as string));
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => {
+          controller.abort("Request timeout");
+        }, 5000);
+
+        const res = await fetch(API_ENDPOINTS.userBlogById(id as string), {
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
         if (!res.ok) throw new Error("Failed to fetch post");
         const data = await res.json();
         setPost(data);
-      } catch (error) {
-        console.error(error);
+      } catch (error: unknown) {
+        console.error("Fetch error:", error);
+        if (error instanceof Error) {
+          if (
+            error.name === "AbortError" ||
+            error.message.includes("timeout")
+          ) {
+            setError(
+              "Backend connection timeout. Please start the backend server.",
+            );
+          } else if (
+            error.message.includes("fetch") ||
+            error.message.includes("Failed to fetch")
+          ) {
+            setError(
+              "Could not connect to backend. Please make sure it's running on port 5000.",
+            );
+          } else {
+            setError("Failed to load blog post");
+          }
+        } else {
+          setError("Failed to load blog post");
+        }
       } finally {
         setLoading(false);
       }
@@ -54,6 +86,21 @@ export default function UserBlogPostPage() {
           <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
           <div className="mt-4 text-zinc-400 font-medium">Loading Story...</div>
         </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center gap-6 px-6">
+        <h1 className="text-4xl font-bold text-red-400">Error Loading Post</h1>
+        <p className="text-zinc-400 text-center max-w-md">{error}</p>
+        <Link
+          href="/blog"
+          className="px-8 py-3 bg-white text-black rounded-full font-bold hover:scale-105 transition-transform"
+        >
+          Back to Blog
+        </Link>
       </div>
     );
   }

@@ -29,11 +29,19 @@ export default function SignupPage() {
     onSuccess: async (tokenResponse: { access_token: string }) => {
       try {
         // Send access token to backend for verification and login/signup
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => {
+          controller.abort("Request timeout");
+        }, 5000);
+
         const res = await fetch(API_ENDPOINTS.googleAuth, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ token: tokenResponse.access_token }),
+          signal: controller.signal,
         });
+
+        clearTimeout(timeoutId);
 
         const data = await res.json();
 
@@ -61,11 +69,19 @@ export default function SignupPage() {
     setError("");
 
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => {
+        controller.abort("Request timeout");
+      }, 5000);
+
       const res = await fetch(API_ENDPOINTS.signup, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
 
       const data = await res.json();
 

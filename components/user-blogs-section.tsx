@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { AnimatedGroup } from "@/components/ui/animated-group";
 import { TextEffect } from "@/components/ui/text-effect";
-import { motion } from "motion/react";
+
 import { CreateBlogDialog } from "./create-blog-dialog";
 import { EditBlogDialog } from "./edit-blog-dialog";
 import { Trash2, Edit } from "lucide-react";
@@ -48,7 +48,13 @@ export function UserBlogsSection({
         ? API_ENDPOINTS.userBlogsByUser(userId)
         : API_ENDPOINTS.userBlogs;
 
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => {
+        controller.abort("Request timeout");
+      }, 5000);
+
       const res = await fetch(endpoint, {
+        signal: controller.signal,
         headers: {
           ...(typeof window !== "undefined" && localStorage.getItem("token")
             ? { Authorization: `Bearer ${localStorage.getItem("token")}` }
@@ -56,11 +62,27 @@ export function UserBlogsSection({
         },
       });
 
+      clearTimeout(timeoutId);
+
       if (!res.ok) throw new Error("Failed to fetch blogs");
       const data = await res.json();
       setBlogs(data);
-    } catch (error) {
-      console.error(error);
+    } catch (error: unknown) {
+      console.error("Fetch error:", error);
+      if (error instanceof Error) {
+        if (error.name === "AbortError" || error.message.includes("timeout")) {
+          console.error(
+            "Backend connection timeout. Please start the backend server.",
+          );
+        } else if (
+          error.message.includes("fetch") ||
+          error.message.includes("Failed to fetch")
+        ) {
+          console.error(
+            "Could not connect to backend. Please make sure it's running on port 5000.",
+          );
+        }
+      }
     } finally {
       setLoading(false);
     }
@@ -75,8 +97,8 @@ export function UserBlogsSection({
       try {
         const payload = JSON.parse(atob(token.split(".")[1]));
         setCurrentUserId(payload.id);
-      } catch (e) {
-        console.error("Failed to parse token");
+      } catch (e: unknown) {
+        console.error("Failed to parse token:", e);
       }
     }
   }, [fetchBlogs]);
@@ -87,9 +109,13 @@ export function UserBlogsSection({
     try {
       await apiClient.delete(API_ENDPOINTS.userBlogById(blogId));
       setBlogs(blogs.filter((blog) => blog.id !== blogId));
-    } catch (err) {
-      console.error("Failed to delete blog:", err);
-      alert("Failed to delete blog post");
+    } catch (error: unknown) {
+      console.error("Failed to delete blog:", error);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to delete blog post. Please try again.";
+      alert(errorMessage);
     }
   };
 

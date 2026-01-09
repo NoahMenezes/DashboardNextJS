@@ -107,15 +107,19 @@ export function CreateBlogDialog({ onBlogCreated }: CreateBlogDialogProps) {
       setCategory("");
       setImageUrl("");
       setContent("");
-      setOpen(false);
 
-      // Notify parent component
+      // Close dialog and notify parent
+      setOpen(false);
       if (onBlogCreated) {
         onBlogCreated();
       }
-    } catch (err) {
-      const error = err as Error;
-      setError(error.message || "Failed to create blog post");
+    } catch (error: unknown) {
+      console.error("Failed to create blog:", error);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to create blog post. Please try again.";
+      alert(errorMessage);
     } finally {
       setLoading(false);
     }

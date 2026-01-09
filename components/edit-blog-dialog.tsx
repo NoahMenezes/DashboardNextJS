@@ -144,9 +144,13 @@ export function EditBlogDialog({
       }
 
       setOpen(false);
-    } catch (err) {
-      const error = err as Error;
-      setError(error.message || "Failed to update blog post");
+    } catch (error: unknown) {
+      console.error("Failed to update blog:", error);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to update blog post. Please try again.";
+      alert(errorMessage);
     } finally {
       setLoading(false);
     }

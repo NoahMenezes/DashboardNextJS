@@ -36,20 +36,38 @@ export const apiClient = {
       ...(token && { Authorization: `Bearer ${token}` }),
     };
 
-    const response = await fetch(url, {
-      ...options,
-      method: "GET",
-      headers,
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+      controller.abort("Request timeout");
+    }, 10000);
 
-    if (!response.ok) {
-      const error = await response
-        .json()
-        .catch(() => ({ error: "Request failed" }));
-      throw new Error(error.error || `HTTP ${response.status}`);
+    try {
+      const response = await fetch(url, {
+        ...options,
+        method: "GET",
+        headers,
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const error = await response
+          .json()
+          .catch(() => ({ error: "Request failed" }));
+        throw new Error(error.error || `HTTP ${response.status}`);
+      }
+
+      return response.json();
+    } catch (error: unknown) {
+      clearTimeout(timeoutId);
+      if (error instanceof Error && error.name === "AbortError") {
+        throw new Error(
+          "Request timeout. Please ensure the backend is running on port 5000.",
+        );
+      }
+      throw error;
     }
-
-    return response.json();
   },
 
   post: async <T = unknown>(
@@ -65,21 +83,39 @@ export const apiClient = {
       ...(token && { Authorization: `Bearer ${token}` }),
     };
 
-    const response = await fetch(url, {
-      ...options,
-      method: "POST",
-      headers,
-      body: JSON.stringify(data),
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+      controller.abort("Request timeout");
+    }, 10000);
 
-    if (!response.ok) {
-      const error = await response
-        .json()
-        .catch(() => ({ error: "Request failed" }));
-      throw new Error(error.error || `HTTP ${response.status}`);
+    try {
+      const response = await fetch(url, {
+        ...options,
+        method: "POST",
+        headers,
+        body: JSON.stringify(data),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const error = await response
+          .json()
+          .catch(() => ({ error: "Request failed" }));
+        throw new Error(error.error || `HTTP ${response.status}`);
+      }
+
+      return response.json() as Promise<T>;
+    } catch (error: unknown) {
+      clearTimeout(timeoutId);
+      if (error instanceof Error && error.name === "AbortError") {
+        throw new Error(
+          "Request timeout. Please ensure the backend is running on port 5000.",
+        );
+      }
+      throw error;
     }
-
-    return response.json() as Promise<T>;
   },
 
   put: async <T = unknown>(
@@ -95,21 +131,39 @@ export const apiClient = {
       ...(token && { Authorization: `Bearer ${token}` }),
     };
 
-    const response = await fetch(url, {
-      ...options,
-      method: "PUT",
-      headers,
-      body: JSON.stringify(data),
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+      controller.abort("Request timeout");
+    }, 10000);
 
-    if (!response.ok) {
-      const error = await response
-        .json()
-        .catch(() => ({ error: "Request failed" }));
-      throw new Error(error.error || `HTTP ${response.status}`);
+    try {
+      const response = await fetch(url, {
+        ...options,
+        method: "PUT",
+        headers,
+        body: JSON.stringify(data),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const error = await response
+          .json()
+          .catch(() => ({ error: "Request failed" }));
+        throw new Error(error.error || `HTTP ${response.status}`);
+      }
+
+      return response.json() as Promise<T>;
+    } catch (error: unknown) {
+      clearTimeout(timeoutId);
+      if (error instanceof Error && error.name === "AbortError") {
+        throw new Error(
+          "Request timeout. Please ensure the backend is running on port 5000.",
+        );
+      }
+      throw error;
     }
-
-    return response.json() as Promise<T>;
   },
 
   delete: async (url: string, options?: RequestInit) => {
@@ -120,20 +174,38 @@ export const apiClient = {
       ...(token && { Authorization: `Bearer ${token}` }),
     };
 
-    const response = await fetch(url, {
-      ...options,
-      method: "DELETE",
-      headers,
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+      controller.abort("Request timeout");
+    }, 10000);
 
-    if (!response.ok) {
-      const error = await response
-        .json()
-        .catch(() => ({ error: "Request failed" }));
-      throw new Error(error.error || `HTTP ${response.status}`);
+    try {
+      const response = await fetch(url, {
+        ...options,
+        method: "DELETE",
+        headers,
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const error = await response
+          .json()
+          .catch(() => ({ error: "Request failed" }));
+        throw new Error(error.error || `HTTP ${response.status}`);
+      }
+
+      return response.json();
+    } catch (error: unknown) {
+      clearTimeout(timeoutId);
+      if (error instanceof Error && error.name === "AbortError") {
+        throw new Error(
+          "Request timeout. Please ensure the backend is running on port 5000.",
+        );
+      }
+      throw error;
     }
-
-    return response.json();
   },
 };
 

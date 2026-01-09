@@ -3,19 +3,12 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
+
 import { AnimatedGroup } from "@/components/ui/animated-group";
 import { TextEffect } from "@/components/ui/text-effect";
 import { HeroHeader } from "./header";
 import FooterSection from "./footer";
 import { motion } from "motion/react";
-import { CreateBlogDialog } from "./create-blog-dialog";
 import { EditBlogDialog } from "./edit-blog-dialog";
 import { Trash2, Edit } from "lucide-react";
 import { apiClient, API_ENDPOINTS } from "@/lib/api";
@@ -41,15 +34,44 @@ export function BlogSection() {
     try {
       setError("");
       setLoading(true);
-      const res = await fetch(API_ENDPOINTS.blogs);
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => {
+        controller.abort("Request timeout");
+      }, 5000);
+
+      const res = await fetch(API_ENDPOINTS.blogs, {
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
       if (!res.ok) throw new Error("Failed to fetch posts");
       const data = await res.json();
       setPosts(data);
-    } catch (error) {
-      console.error(error);
-      setError(
-        "Could not load blog posts. Please make sure the backend is running.",
-      );
+    } catch (error: unknown) {
+      console.error("Fetch error:", error);
+
+      if (error instanceof Error) {
+        if (error.name === "AbortError" || error.message.includes("timeout")) {
+          setError(
+            "Backend connection timeout. Please start the backend server with: cd backend && npm start",
+          );
+        } else if (
+          error.message.includes("fetch") ||
+          error.message.includes("Failed to fetch")
+        ) {
+          setError(
+            "Could not connect to backend. Please make sure the backend is running on port 5000.",
+          );
+        } else {
+          setError(error.message);
+        }
+      } else {
+        setError(
+          "Could not load blog posts. Please make sure the backend is running.",
+        );
+      }
     } finally {
       setLoading(false);
     }
@@ -65,8 +87,8 @@ export function BlogSection() {
         const payload = JSON.parse(atob(token.split(".")[1]));
         // Check if user is admin (user id 3 or email contains 'admin')
         setIsAdmin(payload.id === 3 || payload.email?.includes("admin"));
-      } catch (e) {
-        console.error("Failed to parse token");
+      } catch (e: unknown) {
+        console.error("Failed to parse token:", e);
       }
     }
   }, [fetchPosts]);
@@ -77,9 +99,13 @@ export function BlogSection() {
     try {
       await apiClient.delete(API_ENDPOINTS.blogById(postId));
       setPosts(posts.filter((post) => post.id !== postId));
-    } catch (err) {
-      console.error("Failed to delete blog:", err);
-      alert("Failed to delete blog post");
+    } catch (error: unknown) {
+      console.error("Failed to delete blog:", error);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to delete blog post. Please try again.";
+      alert(errorMessage);
     }
   };
 
@@ -166,7 +192,7 @@ export function BlogSection() {
               },
             }}
           >
-            {posts.map((post) => (
+            {posts.map((post: BlogPost) => (
               <div key={post.id} className="relative group">
                 <Link href={`/blog/${post.id}`} className="block relative">
                   <div className="relative aspect-[16/10] overflow-hidden rounded-[2.5rem] border border-white/10 bg-zinc-900 transition-all duration-500 group-hover:border-primary/50 group-hover:shadow-[0_0_50px_-12px_rgba(var(--primary),0.2)]">
@@ -204,7 +230,7 @@ export function BlogSection() {
                     onClick={(e) => e.stopPropagation()}
                   >
                     <button
-                      onClick={(e) => {
+                      onClick={(e: React.MouseEvent) => {
                         e.preventDefault();
                         e.stopPropagation();
                         setEditingPost(post);
@@ -215,7 +241,7 @@ export function BlogSection() {
                       <Edit className="w-4 h-4 text-white" />
                     </button>
                     <button
-                      onClick={(e) => {
+                      onClick={(e: React.MouseEvent) => {
                         e.preventDefault();
                         e.stopPropagation();
                         handleDelete(post.id);

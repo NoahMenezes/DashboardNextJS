@@ -35,13 +35,40 @@ export function UsersTable() {
   React.useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await fetch(API_ENDPOINTS.users);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => {
+          controller.abort("Request timeout");
+        }, 5000);
+
+        const res = await fetch(API_ENDPOINTS.users, {
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
         if (res.ok) {
           const data = await res.json();
           setUsers(data);
         }
-      } catch (error) {
-        console.error("Failed to fetch users", error);
+      } catch (error: unknown) {
+        console.error("Error fetching users:", error);
+        if (error instanceof Error) {
+          if (
+            error.name === "AbortError" ||
+            error.message.includes("timeout")
+          ) {
+            console.error(
+              "Backend connection timeout. Please start the backend server.",
+            );
+          } else if (
+            error.message.includes("fetch") ||
+            error.message.includes("Failed to fetch")
+          ) {
+            console.error(
+              "Could not connect to backend. Please make sure it's running on port 5000.",
+            );
+          }
+        }
       } finally {
         setLoading(false);
       }

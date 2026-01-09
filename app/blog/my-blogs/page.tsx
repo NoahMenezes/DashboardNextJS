@@ -32,8 +32,13 @@ export default function MyBlogsPage() {
       const data = await apiClient.get(API_ENDPOINTS.myBlogs);
       setBlogs(data);
       setIsAuthenticated(true);
-    } catch (error) {
-      console.error("Failed to fetch my blogs:", error);
+    } catch (error: unknown) {
+      console.error("Failed to fetch blogs:", error);
+      if (error instanceof Error && error.message.includes("timeout")) {
+        console.error(
+          "Backend connection timeout. Please start the backend server.",
+        );
+      }
       setIsAuthenticated(false);
     } finally {
       setLoading(false);
@@ -61,9 +66,13 @@ export default function MyBlogsPage() {
     try {
       await apiClient.delete(API_ENDPOINTS.userBlogById(blogId));
       setBlogs(blogs.filter((blog) => blog.id !== blogId));
-    } catch (err) {
-      console.error("Failed to delete blog:", err);
-      alert("Failed to delete blog post");
+    } catch (error: unknown) {
+      console.error("Failed to delete blog:", error);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to delete blog post. Please try again.";
+      alert(errorMessage);
     }
   };
 
